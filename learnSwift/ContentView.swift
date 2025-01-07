@@ -24,22 +24,24 @@ struct ContentView: View {
 }
 
 struct CardView: View{
-    var isFace: Bool = false
+    @State var isFace: Bool = false
     
     var body: some View {
-        
-            ZStack(content: {
+        ZStack {
+            let base = RoundedRectangle(cornerRadius: 12)
+            
                 if isFace{
-                    RoundedRectangle(cornerRadius: 12)
-                        .foregroundColor(.white)
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(lineWidth: 6)
+                    base.fill(.white)
+                    base.strokeBorder(lineWidth: 6)
                     
                     Text("👹").font(.largeTitle)
                 } else {
-                    RoundedRectangle(cornerRadius: 12)
+                    base.fill()
                 }
-            })
+        }
+        .onTapGesture {
+            isFace.toggle()
+        }
             
         }
     }
