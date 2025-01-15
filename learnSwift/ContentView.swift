@@ -8,23 +8,58 @@
 import SwiftUI
 
 struct ContentView: View {
-    let emojis : [String] = ["🐳", "🐊", "🐿️", "🕊️"]
+    let emojis : [String] = ["🐳", "🐊", "🐿️", "🕊️", "🐠", "🦧", "🐝", "🦆", "🦌", "🦜", "🐇", "🐘" ]
+    
+    @State var cardCount: Int = 4
+    
     var body: some View {
-        HStack{
-            ForEach(emojis.indices, id: \.self) { index in
-                CardView(content: emojis[index])
-
-        
+        VStack{
+            ScrollView{
+                cards
             }
-            
+            Spacer()
+            cardCountAdjuster
         }
-        
-        
-        .foregroundColor(.green)
-
         .padding()
     }
+    
+    var cardCountAdjuster: some View {
+        HStack{
+            cardAdder
+            Spacer()
+            cardRemover
+        } .imageScale(.large)
+            .font(.largeTitle)
+    }
+
+    var cards: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 130))]){
+            ForEach(0..<cardCount, id: \.self) { index in
+                CardView(content: emojis[index])
+                    .aspectRatio(2/3, contentMode: .fit)
+            }
+        }
+        .foregroundColor(.purple)
+    }
+    
+    func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
+        Button(action: {
+            cardCount += offset
+        }, label: {
+            Image(systemName: symbol)
+        })
+        .disabled(cardCount + offset < 1 || cardCount + offset > emojis.count)
+    }
+    var cardAdder: some View {
+        return cardCountAdjuster(by: +1, symbol: "plus.square.fill")
+    }
+    
+    var cardRemover: some View {
+        return cardCountAdjuster(by: -1, symbol: "minus.square.fill")
+    }
 }
+
+
 
 struct CardView: View{
     let content : String
@@ -34,14 +69,15 @@ struct CardView: View{
         ZStack {
             let base = RoundedRectangle(cornerRadius: 12)
             
-                if isFace{
+                Group{
                     base.fill(.white)
                     base.strokeBorder(lineWidth: 6)
                     
                     Text(content).font(.largeTitle)
-                } else {
-                    base.fill()
                 }
+                .opacity(isFace ? 1 : 0)
+                    base.fill().opacity(isFace ? 0 : 1)
+                
         }
         .onTapGesture {
             isFace.toggle()
